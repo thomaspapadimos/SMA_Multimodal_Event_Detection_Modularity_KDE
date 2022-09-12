@@ -45,11 +45,7 @@ def days_to_tmstmp(date_from,date_to):
 
     return timestamp_from,timestamp_to
 
-
-
 def event_detection(date,r,R_kde,days):
-
-   # for i in range(days):
    for date in dates:
         date += datetime.timedelta(days=1)
         date_target = date - datetime.timedelta(days=1)
@@ -58,7 +54,6 @@ def event_detection(date,r,R_kde,days):
         modularity = []
         kde = []
         days = []
-
         for d in range(r):
             date_from = date - datetime.timedelta(days=r-d)
             date_to = date - datetime.timedelta(days=r-d-1)
@@ -72,11 +67,9 @@ def event_detection(date,r,R_kde,days):
             del df, user_pairs
             #------MODULARITY SCORE CALCULATION--------
             try:
-          #      start_time = time.time()
                 mod_score = float(subprocess.check_output(['Rscript' , 'community_detection_expiriments.R']))
                 modularity.append(mod_score)
-           #     print("---MODULARITY computed in %s seconds ---" % (time.time() - start_time))
-            #    del start_time
+
             except:
                 modularity.append(0)
             days.append(date_from.strftime('%m-%d'))
@@ -87,15 +80,11 @@ def event_detection(date,r,R_kde,days):
         #--------KDE CALCULATION----------
             date_from = date - datetime.timedelta(days=r-d+R_kde)
             date_to = date - datetime.timedelta(days=r-d-1)
-            #print("Unix_Time_stamp: ", (time.mktime(date.timetuple())))
             timestamp_from = date_from.replace(tzinfo=datetime.timezone.utc).timestamp() * 1000
             timestamp_to = date_to.replace(tzinfo=datetime.timezone.utc).timestamp() * 1000
             a = tweets.find({"timestamp_ms_long": {"$gte": timestamp_from, "$lte": timestamp_to}, "lang": 'es', "location": {"$exists": True}},
                                {'full_text': 1, 'timestamp_ms_long': 1, "_id": 0})
-            #start_time = time.time()
             df = pd.DataFrame(a)
-            #print("---KDE computed in %s seconds ---" % (time.time() - start_time))
-            #del start_time
             try:
                 kde.append(temp_feature(df))
             except:
@@ -112,7 +101,6 @@ def event_detection(date,r,R_kde,days):
                 flag=True
         if flag:
             print('EVENT FOUND!!')
-            #plot
             color = ['#00429d', '#2754a6', '#3a67ae', '#487bb7', '#548fc0',
                      '#5ea3c9', '#66b8d3', '#6acedd', '#68e5e9', '#ffe2ca',
                      '#ffc4b4', '#ffa59e', '#f98689', '#ed6976', '#dd4c65',
